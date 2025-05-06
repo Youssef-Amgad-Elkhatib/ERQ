@@ -3,6 +3,7 @@
 #include <sstream>
 #include <cctype>
 #include <string>
+#include <iomanip>
 using namespace std;
 
 struct patient{
@@ -90,12 +91,6 @@ public:
     }
 
     void insert(patient& patient){
-        for(int i=0; i<size; i++){
-            if(patient.name== emergencyList[i].name){
-                cout << "This patient's name already exists" <<endl;
-                return;
-            }
-        }
 
         if (size >= capacity) {
             resize(capacity * 2);
@@ -291,6 +286,8 @@ void testCases(MaxHeap& emergencyQueue) {
             patient p;
             ss >> p.name >> p.severity >> p.arrivalTime;
             emergencyQueue.insert(p);
+            cout << "Inserted: " << p.name << " (Severity: " << p.severity << ", Arrival: " << p.arrivalTime << ")" << endl;
+            emergencyQueue.printHeap();
         }
 
         else if (command == "EXTRACT") {
@@ -425,19 +422,22 @@ int main() {
         }
 
         do {
-            cout << "\n****************** Emergency Room MaxHeap Priority System ******************" << endl;
-            cout << "1. Add New Patient" << endl;
-            cout << "2. Treat Next Patient (Extract Max)" << endl;
-            cout << "3. View Next Patient (Peek Max)" << endl;
-            cout << "4. Update Patient Severity" << endl;
-            cout << "5. Find Patient Information" << endl;
-            cout << "6. Remove Patient from Heap" << endl;
-            cout << "7. View Current MaxHeap" << endl;
-            cout << "8. View Average Severity" << endl;
-            cout << "9. View Status of Average Severity" << endl;
-            cout << "10. View Treatment Log" << endl;
-            cout << "11. Save Patient History" << endl;
-            cout << "12. Return to Main Menu" << endl;
+            cout << "\n****************** Emergency Room MaxHeap Priority System ******************" << endl<<endl;
+            cout << setw(10) << "1.  Add New Patient"
+                 << setw(55) << "2.  Treat Next Patient (Extract Max)"
+                 << setw(40)<< "3.  View Next Patient (Peek Max)" << endl;
+
+            cout << setw(20) << "4.  Update Patient Severity"
+                 << setw(39) << "5.  Find Patient Information"
+                 << setw(44)<< "6.  Remove Patient from Heap" << endl;
+
+            cout << setw(20) << "7.  View Current EmergencyList"
+                 << setw(33) << "8.  View Average Severity"
+                 <<setw(34)<< "9.  View Status" << endl;
+
+            cout << setw(20) << "10. View Treatment Log"
+                 << setw(40) << "11. Save Patient History"
+                 << setw(36)<<"12. Exit Program" << endl<<endl;
 
             mainChoice = getValidatedInt("Enter your choice (1-12): ", 1, 12);
 
@@ -455,6 +455,7 @@ int main() {
 
                 emergencyQueue.insert(p);
                 cout << "Patient added successfully!" << endl;
+                emergencyQueue.printHeap();
                 break;
 
             case 2:
@@ -546,12 +547,18 @@ int main() {
 
             case 12:
                 cout << "==============================================================="<< endl;
-                cout << "12. Returning to Main Menu" << endl;
+                cout << "12. Exiting Program" << endl;
                 cout << "==============================================================="<< endl;
+                exit(0);
+                break;
+
+            default:
+                cout << "Invalid Choice"<<endl;
                 break;
             }
 
-        } while (mainChoice != 12);
+
+        } while (true);
     }
     return 0;
 }
