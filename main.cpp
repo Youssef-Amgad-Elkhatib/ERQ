@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cctype>
+#include <string>
 using namespace std;
 
 struct patient{
@@ -341,6 +343,46 @@ void testCases(MaxHeap& emergencyQueue) {
     }
 }
 
+//check if a string contains only digits
+bool isDigitsOnly(const string &s) {
+    for (char c : s) {
+        if (!isdigit(c)) {
+            return false;
+        }
+    }
+    return !s.empty();
+}
+
+// get validated integer input
+int getValidatedInt(const string &prompt, int minVal, int maxVal) {
+    string input;
+    int value;
+
+    while (true) {
+        cout << prompt;
+        getline(cin, input);
+
+        if (!isDigitsOnly(input)) {
+            cout << "Invalid input! Please enter numbers only (" << minVal << "-" << maxVal << ") " << endl;
+            continue;
+        }
+
+        try {
+            value = stoi(input);
+        } catch (...) {
+            cout << "Invalid input! Please enter a valid number (" << minVal << "-" << maxVal << ") " << endl;
+            continue;
+        }
+
+        // Check range
+        if (value >= minVal && value <= maxVal) {
+            return value;
+        }
+
+        cout << "Input out of range! Please enter between " << minVal << " and " << maxVal << endl;
+    }
+}
+
 int main() {
     MaxHeap emergencyQueue;
     int loadChoice;
@@ -348,165 +390,168 @@ int main() {
     string name;
     int severity, arrivalTime;
     patient p;
+    string input;
 
- while(true){
-    cout << "Do you want to:\n";
-    cout << "1. Load from history file\n";
-    cout << "2. Start with an empty list\n";
-    cout << "3. Load test cases from 'TestCases.txt'\n";
-    cout << "4. Exit\n";
-    cout << "Enter your choice (1-4): ";
-    cin >> loadChoice;
+    while(true) {
+        cout << "Do you want to:\n";
+        cout << "1. Load from history file\n";
+        cout << "2. Start with an empty list\n";
+        cout << "3. Load test cases from 'TestCases.txt'\n";
+        cout << "4. Exit\n";
 
-    while (loadChoice < 1 || loadChoice > 4) {
-                 cout << "Invalid input! Please enter Numbers from 1-4: ";
-                 cin >> loadChoice;
-             }
+        loadChoice = getValidatedInt("Enter your choice (1-4): ", 1, 4);
 
-             if (loadChoice == 4) {
-                 cout << "Exiting program. Goodbye!" << endl;
-                 break;
-             }
+        if (loadChoice == 4) {
+            cout << "==============================================================="<< endl;
+            cout << "Exiting program. Goodbye!" << endl;
+            cout << "==============================================================="<< endl;
+            break;
+        }
+        if (loadChoice == 1) {
+            emergencyQueue.loadHistory();
+            cout << "==============================================================="<< endl;
+            cout << "History loaded successfully!" << endl;
+            cout << "==============================================================="<< endl;
+        } else if (loadChoice == 2) {
+            cout << "==============================================================="<< endl;
+            cout << "Starting with an empty patient list." << endl;
+            cout << "==============================================================="<< endl;
+        } else if (loadChoice == 3) {
+            testCases(emergencyQueue);
+            cout << "==============================================================="<< endl;
+            cout << "TestCases Finished Successfully"<< endl;
+            cout << "==============================================================="<< endl;
+            continue;
+        }
 
-    if (loadChoice == 1) {
-        emergencyQueue.loadHistory();
-        cout << "==============================================================="<< endl;
-        cout << "History loaded successfully!" << endl;
-        cout << "==============================================================="<< endl;
-    } else if (loadChoice == 2) {
-        cout << "==============================================================="<< endl;
-        cout << "Starting with an empty patient list." << endl;
-        cout << "==============================================================="<< endl;
-    } else if (loadChoice == 3) {
-        testCases(emergencyQueue);
-        cout << "==============================================================="<< endl;
-        cout<< "TestCases Finished Successfully"<< endl;
-        cout << "==============================================================="<< endl;
-        continue;
+        do {
+            cout << "\n****************** Emergency Room MaxHeap Priority System ******************" << endl;
+            cout << "1. Add New Patient" << endl;
+            cout << "2. Treat Next Patient (Extract Max)" << endl;
+            cout << "3. View Next Patient (Peek Max)" << endl;
+            cout << "4. Update Patient Severity" << endl;
+            cout << "5. Find Patient Information" << endl;
+            cout << "6. Remove Patient from Heap" << endl;
+            cout << "7. View Current MaxHeap" << endl;
+            cout << "8. View Average Severity" << endl;
+            cout << "9. View Status of Average Severity" << endl;
+            cout << "10. View Treatment Log" << endl;
+            cout << "11. Save Patient History" << endl;
+            cout << "12. Return to Main Menu" << endl;
+
+            mainChoice = getValidatedInt("Enter your choice (1-12): ", 1, 12);
+
+            switch (mainChoice) {
+            case 1:
+                cout << "Enter patient name: ";
+                getline(cin, p.name);
+                while (p.name.empty()) {
+                    cout << "Name cannot be empty! Please enter patient name: ";
+                    getline(cin, p.name);
+                }
+
+                p.severity = getValidatedInt("Enter severity (1-100): ", 1, 100);
+                p.arrivalTime = getValidatedInt("Enter arrival time (positive number): ", 1, INT_MAX);
+
+                emergencyQueue.insert(p);
+                cout << "Patient added successfully!" << endl;
+                break;
+
+            case 2:
+                p = emergencyQueue.extractMax();
+                if (p.name == "None") {
+                    cout << "No patients in the queue!" << endl;
+                }
+                else {
+                    cout << "Treated patient: " << p.name
+                        << " (Severity: " << p.severity
+                        << ", Arrival Time: " << p.arrivalTime << ")" << endl;
+                }
+                break;
+
+            case 3:
+                p = emergencyQueue.peek();
+                if (p.name == "None") {
+                    cout << "No patients in the queue!" << endl;
+                }
+                else {
+                    cout << "Next patient to treat: " << p.name
+                        << " (Severity: " << p.severity
+                        << ", Arrival Time: " << p.arrivalTime << ")" << endl;
+                }
+                break;
+
+            case 4:
+                cout << "Enter patient name: ";
+                getline(cin, name);
+                while (name.empty()) {
+                    cout << "Name cannot be empty! Please enter patient name: ";
+                    getline(cin, name);
+                }
+
+                severity = getValidatedInt("Enter new severity (1-100): ", 1, 100);
+                emergencyQueue.updateSeverity(name, severity);
+                break;
+
+            case 5:
+                cout << "Enter patient name: ";
+                getline(cin, name);
+                while (name.empty()) {
+                    cout << "Name cannot be empty! Please enter patient name: ";
+                    getline(cin, name);
+                }
+
+                p = emergencyQueue.findPatient(name);
+                if (p.name != "None") {
+                    cout << "Patient found: " << p.name
+                        << " (Severity: " << p.severity
+                        << ", Arrival Time: " << p.arrivalTime << ")" << endl;
+                } else {
+                    cout << "Patient not found in the queue." << endl;
+                }
+                break;
+
+            case 6:
+                cout << "Enter patient name to remove: ";
+                getline(cin, name);
+                while (name.empty()) {
+                    cout << "Name cannot be empty! Please enter patient name: ";
+                    getline(cin, name);
+                }
+
+                emergencyQueue.removePatient(name);
+                break;
+
+            case 7:
+                emergencyQueue.printHeap();
+                break;
+
+            case 8:
+                cout << "Average severity: " << emergencyQueue.getAverage() << endl;
+                break;
+
+            case 9:
+                emergencyQueue.status();
+                break;
+
+            case 10:
+                cout << "\n===== Treatment History =====" << endl;
+                emergencyQueue.displayTreatmentLog();
+                break;
+
+            case 11:
+                emergencyQueue.saveHistory();
+                cout << "Patient history saved to 'EmergencyList'." << endl;
+                break;
+
+            case 12:
+                cout << "==============================================================="<< endl;
+                cout << "12. Returning to Main Menu" << endl;
+                cout << "==============================================================="<< endl;
+                break;
+            }
+
+        } while (mainChoice != 12);
     }
-
-    do {
-        cout << "\n****************** Emergency Room MaxHeap Priority System ******************" << endl;
-        cout << "1. Add New Patient" << endl;
-        cout << "2. Treat Next Patient (Extract Max)" << endl;
-        cout << "3. View Next Patient (Peek Max)" << endl;
-        cout << "4. Update Patient Severity" << endl;
-        cout << "5. Find Patient Information" << endl;
-        cout << "6. Remove Patient from Heap" << endl;
-        cout << "7. View Current MaxHeap" << endl;
-        cout << "8. View Average Severity" << endl;
-        cout << "9. View Status of Average Severity" << endl;
-        cout << "10. View Treatment Log" << endl;
-        cout << "11. Save Patient History" << endl;
-        cout << "12. Return to Main Menu" << endl;
-        cout << "Enter your choice (1-12): ";
-        cin >> mainChoice;
-
-        while (mainChoice < 1 || mainChoice > 12) {
-            cout << "Invalid input! Please enter a number between 1 and 12: ";
-            cin >> mainChoice;
-        }
-
-        switch (mainChoice) {
-        case 1:
-            cout << "Enter patient name: ";
-            cin >> p.name;
-            cout << "Enter severity (1-100): ";
-            cin >> p.severity;
-            while (p.severity < 1 || p.severity > 100) {
-                cout << "Severity must be between 1 and 100! Try again: ";
-                cin >> p.severity;
-            }
-            cout << "Enter arrival time: ";
-            cin >> p.arrivalTime;
-            emergencyQueue.insert(p);
-            cout << "Patient added successfully!" << endl;
-            break;
-
-        case 2:
-            p = emergencyQueue.extractMax();
-            if (p.name == "None") {
-                cout << "No patients in the queue!" << endl;
-            }
-            else {
-                cout << "Treated patient: " << p.name
-                    << " (Severity: " << p.severity
-                    << ", Arrival Time: " << p.arrivalTime << ")" << endl;
-            }
-            break;
-
-        case 3:
-            p = emergencyQueue.peek();
-            if (p.name == "None") {
-                cout << "No patients in the queue!" << endl;
-            }
-            else {
-                cout << "Next patient to treat: " << p.name
-                    << " (Severity: " << p.severity
-                    << ", Arrival Time: " << p.arrivalTime << ")" << endl;
-            }
-            break;
-
-        case 4:
-            cout << "Enter patient name: ";
-            cin >> name;
-            cout << "Enter new severity (1-100): ";
-            cin >> severity;
-            while (severity < 1 || severity > 100) {
-                cout << "Severity must be between 1 and 100! Try again: ";
-                cin >> severity;
-            }
-            emergencyQueue.updateSeverity(name, severity);
-            break;
-
-        case 5:
-            cout << "Enter patient name: ";
-            cin >> name;
-            p = emergencyQueue.findPatient(name);
-            if (p.name != "None") {
-                cout << "Patient found: " << p.name
-                    << " (Severity: " << p.severity
-                    << ", Arrival Time: " << p.arrivalTime << ")" << endl;
-            }
-            break;
-
-        case 6:
-            cout << "Enter patient name to remove: ";
-            cin >> name;
-            emergencyQueue.removePatient(name);
-            break;
-
-        case 7:
-            emergencyQueue.printHeap();
-            break;
-
-        case 8:
-            cout << "Average severity: " << emergencyQueue.getAverage() << endl;
-            break;
-
-        case 9:
-            emergencyQueue.status();
-            break;
-
-        case 10:
-            cout << "\n===== Treatment History =====" << endl;
-            emergencyQueue.displayTreatmentLog();
-            break;
-
-        case 11:
-            emergencyQueue.saveHistory();
-            cout << "Patient history saved to 'EmergencyList'." << endl;
-            break;
-
-        case 12:
-            cout << "==============================================================="<< endl;
-            cout << "12. Returning to Main Menu" << endl;
-            cout << "==============================================================="<< endl;
-            break;
-        }
-
-    } while (mainChoice != 12);
-
-}
     return 0;
 }
