@@ -21,3 +21,10 @@ A C++ console application that simulates an Emergency Room using a Max Heap to p
 - 🧪 Supports loading batch test cases from testcases.txt
   
 ---
+
+## ✍️ Authors
+
+- [Youssef Amgad Elkhatib](https://github.com/Youssef-Amgad-Elkhatib)
+- [Hager Ahmed Tantawy](https://github.com/hagerah2005)
+
+---  
